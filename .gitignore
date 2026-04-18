@@ -47,3 +47,8 @@
 
 # build directory
 build/
+
+
+#Gnuplot Header files
+gnuplot-iostream.h
+*.gp
