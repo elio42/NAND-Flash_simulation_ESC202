@@ -43,3 +43,7 @@
 # Temporary files
 **build*/
 **output*/
+
+#Gnuplot Header files
+gnuplot-iostream.h
+*.gp
