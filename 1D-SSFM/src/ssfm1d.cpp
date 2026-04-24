@@ -3,10 +3,10 @@
 /*
 Documentation, //ToDo: Allow for parameters.
 */
-SSFM1D::SSFM1D() {
+SSFM1D::SSFM1D(double N, double L, size_t padding) : N(N), L(L), padding(padding) {
     waveFunction.resize(N);
     configure_fftw_plans();
-    set_max_time_step();
+    set_parameters();
     initialize_grid();
     initialize_wavefunction();
     initialize_enviroment_potential();
@@ -25,7 +25,9 @@ void SSFM1D::configure_fftw_plans() {
 Calculate the maximum time step to enssure numerical stability.
 The time step should satisfy the stability condition: $\Delta t \ll \min{(\frac{2m (\Delta x)^2}{\pi \hbar}, \frac{\pi \hbar}{V_{max}})}$
 */
-void SSFM1D::set_max_time_step() {
+void SSFM1D::set_parameters() {
+    dk = 2 * M_PI / L;
+    dx = L / N;
     double saftey_factor = 0.01; // ToDo: Pass value
     dt = saftey_factor * std::min((2 * m * dx * dx) / (M_PI * hbar), (M_PI * hbar) / (boudary_potential));
 }
@@ -66,7 +68,6 @@ void SSFM1D::initialize_enviroment_potential() {
     // Number of grid points to pad on each side of the potential well
     // Maybe come up with an expressing based on dx so that the padding has a fixed lenght. The padding should be large enough to avoid any quantum tunneling through the boundaries of the grid.
     // If there is quantum tunneling through the boundary, waves will wrap around to the other side due to the perodicity of fourier transform.
-    size_t padding = 50;
     enviroment_potential.resize(N);
 
     for (size_t i = 0; i < enviroment_potential.size(); ++i) {
@@ -170,10 +171,12 @@ std::vector<double> SSFM1D::calculate_probability_density() {
     return probability_density;
 }
 
-void SSFM1D::output_wavefunction(const std::string& filename) {
-    FILE* file = fopen(filename.c_str(), "w");
+void SSFM1D::output_wavefunction(const std::string& path_to_file, double current_time) {
+    std::string filename = "wavefunction_" + std::to_string(current_time) + ".txt";
+    FILE* file = fopen((path_to_file + filename).c_str(), "w");
+    
     if (file == nullptr) {
-        std::cerr << "Error opening file for writing: " << filename << std::endl;
+        std::cerr << "Error opening file for writing: " << path_to_file << std::endl;
         return;
     }
 

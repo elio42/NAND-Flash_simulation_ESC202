@@ -7,13 +7,9 @@
 #include <complex>
 #include <fftw3.h>
 
-const double L = 1; // Length of the grid
-const double N = 1024;
-const double dx = L / N;
 const double boudary_potential = 1e6;
 const double hbar = 1;
 const double m = 1;
-const double dk = 2 * M_PI / L;
 
 class SSFM1D {
     private:
@@ -28,9 +24,13 @@ class SSFM1D {
         fftw_complex *psi_in;
         double dt;
         double dk;
+        double dx;
+        double N;
+        double L;
+        size_t padding;
 
         void configure_fftw_plans();
-        void set_max_time_step();
+        void set_parameters();
         void initialize_grid();
         void initialize_wavefunction();
         void initialize_enviroment_potential();
@@ -44,9 +44,10 @@ class SSFM1D {
         void inverse_fft();
 
     public:
-        SSFM1D();
+        SSFM1D(double N = 1024, double L = 1, size_t padding = 50);
         
+        double get_dt() const { return dt; }
         void step();
         std::vector<double> calculate_probability_density();
-        void output_wavefunction(const std::string& filename);
+        void output_wavefunction(const std::string& path_to_file, double current_time);
 };

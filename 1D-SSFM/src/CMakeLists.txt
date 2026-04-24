@@ -10,13 +10,17 @@ target_compile_options(SSFM1D PRIVATE
     -O3 -g -Wall -Wextra
     -fsanitize=undefined,float-divide-by-zero
     -fno-sanitize-recover=all
+    -fno-omit-frame-pointer
 )
 
 target_link_options(SSFM1D PRIVATE
     -fsanitize=undefined,float-divide-by-zero
 )
 
-target_include_directories(SSFM1D PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(SSFM1D PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include
+)
 find_package(FFTW3 REQUIRED)
 target_include_directories(SSFM1D PRIVATE ${FFTW3_INCLUDE_DIRS})
 target_link_libraries(SSFM1D PRIVATE ${FFTW3_LIBRARIES})
