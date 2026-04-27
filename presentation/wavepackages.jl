@@ -31,7 +31,7 @@ $$\Psi(x, 0) = \frac{1}{(\sigma \sqrt{\pi})^{1/2}} e^{-\frac{(x-x_0)^2}{2\sigma^
 """
 
 # ╔═╡ 0679cda3-d179-41df-b0ac-76b6f8164c2d
-md"# definitions"
+md"# Definitions"
 
 # ╔═╡ ea734589-20de-48aa-a09a-bb00433bdfcc
 begin
@@ -86,23 +86,11 @@ end
 # ╔═╡ b8f7a426-1962-4d53-b8a9-6d86da96d6c8
 mask(ψ)
 
-# ╔═╡ 46f5c72f-0e35-4da3-8048-1728cfb56b21
-xsincos = collect(range(-π, π, length=N))
+# ╔═╡ 8b648d61-c7b3-413c-aadb-ef74f1855803
 
-# ╔═╡ 2cbe53c5-d516-4a46-ae7f-54a1552467c3
-@bind freq Slider(-512:2:512, default=0.0, show_value=true)
 
-# ╔═╡ 41c19cb3-17d6-4091-8a7d-91a03057ec55
-begin
-	wav = @. cos(xsincos*freq) + sin(xsincos*freq)im
-	plot(real.(wav),label= "ψ r",c="blue",alpha =0.2)
-	plot!(imag.(wav),label= "ψ im",c="red",alpha =0.2)
+# ╔═╡ 8e674232-27f0-43e5-999d-4541d7e63a69
 
-	ff= mask(fft(wav))
-	
-	plot!(real.(ff), alpha = 1, label = "ψ̃ r",c="blue")
-	plot!(imag.(ff), alpha = 1, label = "ψ̃ im",c="red")
-end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1314,8 +1302,7 @@ version = "1.9.2+0"
 # ╠═0a57c92e-ee6e-4423-848e-b33d7b596ab1
 # ╠═b8f7a426-1962-4d53-b8a9-6d86da96d6c8
 # ╠═ea5197e2-a705-40b8-835e-b38c2912b383
-# ╠═46f5c72f-0e35-4da3-8048-1728cfb56b21
-# ╠═2cbe53c5-d516-4a46-ae7f-54a1552467c3
-# ╠═41c19cb3-17d6-4091-8a7d-91a03057ec55
+# ╠═8b648d61-c7b3-413c-aadb-ef74f1855803
+# ╠═8e674232-27f0-43e5-999d-4541d7e63a69
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
