@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     
     parser.add_argument("-t", "--total-time")
         .help("Total simulation time")
-        .default_value(0.005)
+        .default_value(0.01)
         .scan<'g', double>()
         .nargs(1);
 
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 
     parser.add_argument("-i", "--output-interval")
         .help("Simulation-time interval between saved output files")
-        .default_value(0.0005)
+        .default_value(0.0001)
         .scan<'g', double>()
         .nargs(1);
     

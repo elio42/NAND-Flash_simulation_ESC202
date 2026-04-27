@@ -14,8 +14,12 @@ SSFM1D::SSFM1D(double N, double L, size_t padding) : N(N), L(L), padding(padding
     initialise_kinetic_operator();
 }
 
+SSFM1D::~SSFM1D() {
+    fftw_destroy_plan(plan_forward);
+    fftw_destroy_plan(plan_backward);
+}
+
 void SSFM1D::configure_fftw_plans() {
-    //! Plans are not destroyed, will leak a bit of memory.
     psi_in = reinterpret_cast<fftw_complex*>(waveFunction.data());
     plan_forward = fftw_plan_dft_1d(N, psi_in, psi_in, FFTW_FORWARD, FFTW_MEASURE);
     plan_backward = fftw_plan_dft_1d(N, psi_in, psi_in, FFTW_BACKWARD, FFTW_MEASURE);
@@ -28,8 +32,10 @@ The time step should satisfy the stability condition: $\Delta t \ll \min{(\frac{
 void SSFM1D::set_parameters() {
     dk = 2 * M_PI / L;
     dx = L / N;
+    
     double saftey_factor = 0.01; // ToDo: Pass value
-    dt = saftey_factor * std::min((2 * m * dx * dx) / (M_PI * hbar), (M_PI * hbar) / (boudary_potential));
+    double dt_V = (boudary_potential > 1e-9) ? (M_PI * hbar) / boudary_potential : std::numeric_limits<double>::max();
+    dt = saftey_factor * std::min((2 * m * dx * dx) / (M_PI * hbar), dt_V);
 }
 
 /*
@@ -51,7 +57,11 @@ Where:
 */
 void SSFM1D::initialize_wavefunction() {
     double sigma = L / 10;
-    double k0 = ((2 * M_PI)/(10 * dx)) * 0.5;
+    int number_of_waves = 40;
+    double k0 = number_of_waves * (2.0 * M_PI / L);
+    if (k0 >= ((2 * M_PI)/(10 * dx)) * 0.5){
+        std::cerr << "Warning: k0 is large, this may lead to aliasing:" << std::endl;
+    }
     double x0 = 0;
     
     for (size_t i = 0; i < waveFunction.size(); ++i) {
@@ -85,7 +95,8 @@ Initialise the potential evolution operator in real space: $U_V(x) = \exp{(-i \f
 void SSFM1D::initialize_potential_operator() {
     U_p.resize(N);
     for (size_t i = 0; i < U_p.size(); ++i) {
-        U_p[i] = std::exp(std::complex<double>(0, -enviroment_potential[i] * dt / (2 * hbar)));
+        //U_p[i] = std::exp(std::complex<double>(0, -enviroment_potential[i] * dt / (2 * hbar)));
+        U_p[i] = std::polar(1.0, -enviroment_potential[i] * dt / (2 * hbar));
     }
 }
 
@@ -106,7 +117,8 @@ void SSFM1D::initialise_kinetic_operator() {
     }
 
     for (size_t i = 0; i < U_k.size(); ++i) {
-        U_k[i] = std::exp(std::complex<double>(0, -hbar * k[i] * k[i] * dt / (2 * m)));
+        //U_k[i] = std::exp(std::complex<double>(0, -hbar * k[i] * k[i] * dt / (2 * m)));
+        U_k[i] = std::polar(1.0, -hbar * k[i] * k[i] * dt / (2 * m));
     }
 }
 
@@ -151,13 +163,20 @@ void SSFM1D::inverse_fft() {
     fftw_execute(plan_backward);
 }
 
+void SSFM1D::potential_half_step_and_normalize() {
+    double inv_N = 1.0 / N;
+    for (size_t i = 0; i < waveFunction.size(); ++i) {
+        waveFunction[i] = (waveFunction[i] * inv_N) * U_p[i];
+    }
+}
+
 void SSFM1D::step() {
     potential_half_step();
     forward_fft();
     kinetic_full_step();
     inverse_fft();
-    potential_half_step();
-    normalize_wavefunction();
+    potential_half_step_and_normalize();
+    //normalize_wavefunction();
 }
 
 /*

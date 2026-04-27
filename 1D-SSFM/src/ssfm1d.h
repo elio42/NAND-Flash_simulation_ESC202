@@ -42,9 +42,11 @@ class SSFM1D {
         void forward_fft();
         void kinetic_full_step();
         void inverse_fft();
+        void potential_half_step_and_normalize();
 
     public:
         SSFM1D(double N = 1024, double L = 1, size_t padding = 50);
+        ~SSFM1D();
         
         double get_dt() const { return dt; }
         void step();
