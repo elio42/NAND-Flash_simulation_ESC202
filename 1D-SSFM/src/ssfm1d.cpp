@@ -3,7 +3,7 @@
 /*
 Documentation, //ToDo: Allow for parameters.
 */
-SSFM1D::SSFM1D(double N, double L, size_t padding) : N(N), L(L), padding(padding) {
+SSFM1D::SSFM1D(double N, double L, size_t padding, double dt_saftey_factor, int number_of_waves) : N(N), L(L), padding(padding), dt_saftey_factor(dt_saftey_factor), number_of_waves(number_of_waves) {
     waveFunction.resize(N);
     configure_fftw_plans();
     set_parameters();
@@ -33,9 +33,8 @@ void SSFM1D::set_parameters() {
     dk = 2 * M_PI / L;
     dx = L / N;
     
-    double saftey_factor = 0.01; // ToDo: Pass value
     double dt_V = (boudary_potential > 1e-9) ? (M_PI * hbar) / boudary_potential : std::numeric_limits<double>::max();
-    dt = saftey_factor * std::min((2 * m * dx * dx) / (M_PI * hbar), dt_V);
+    dt = dt_saftey_factor * std::min((2 * m * dx * dx) / (M_PI * hbar), dt_V);
 }
 
 /*
@@ -57,7 +56,6 @@ Where:
 */
 void SSFM1D::initialize_wavefunction() {
     double sigma = L / 10;
-    int number_of_waves = 40;
     double k0 = number_of_waves * (2.0 * M_PI / L);
     if (k0 >= ((2 * M_PI)/(10 * dx)) * 0.5){
         std::cerr << "Warning: k0 is large, this may lead to aliasing:" << std::endl;
@@ -79,6 +77,8 @@ void SSFM1D::initialize_enviroment_potential() {
     // Maybe come up with an expressing based on dx so that the padding has a fixed lenght. The padding should be large enough to avoid any quantum tunneling through the boundaries of the grid.
     // If there is quantum tunneling through the boundary, waves will wrap around to the other side due to the perodicity of fourier transform.
     enviroment_potential.resize(N);
+    // int wall = 6;
+    // double wall_potential = 1e4;
 
     for (size_t i = 0; i < enviroment_potential.size(); ++i) {
         if (i < padding || i >= enviroment_potential.size() - padding) {
@@ -87,6 +87,10 @@ void SSFM1D::initialize_enviroment_potential() {
             enviroment_potential[i] = 0;
         }
     }
+    
+    // for (int i = 0; i < wall; ++i) {
+    //     enviroment_potential[300 + i] = wall_potential;
+    // }
 }
 
 /*

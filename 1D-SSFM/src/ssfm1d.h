@@ -28,6 +28,8 @@ class SSFM1D {
         double N;
         double L;
         size_t padding;
+        double dt_saftey_factor;
+        int number_of_waves;
 
         void configure_fftw_plans();
         void set_parameters();
@@ -45,7 +47,7 @@ class SSFM1D {
         void potential_half_step_and_normalize();
 
     public:
-        SSFM1D(double N = 1024, double L = 1, size_t padding = 50);
+        SSFM1D(double N = 1024, double L = 1, size_t padding = 50, double dt_saftey_factor = 0.1, int number_of_waves = 40);
         ~SSFM1D();
         
         double get_dt() const { return dt; }

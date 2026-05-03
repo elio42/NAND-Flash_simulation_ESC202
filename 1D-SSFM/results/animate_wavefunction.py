@@ -55,7 +55,7 @@ def main():
 	ax.set_ylabel("psi")
 	ax.legend()
 
-	fps = args.fps if args.fps is not None else 1000 / 80
+	fps = args.fps if args.fps is not None else 1000 / 50
 	interval_ms = 1000 / fps
 	output_mp4 = Path(args.output)
 	if output_mp4.suffix == "":

@@ -11,6 +11,7 @@ target_compile_options(SSFM1D PRIVATE
     -fsanitize=undefined,float-divide-by-zero
     -fno-sanitize-recover=all
     -fno-omit-frame-pointer
+    -march=native
 )
 
 target_link_options(SSFM1D PRIVATE

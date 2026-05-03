@@ -80,8 +80,20 @@ int main(int argc, char *argv[])
 
     parser.add_argument("-i", "--output-interval")
         .help("Simulation-time interval between saved output files")
-        .default_value(0.0001)
+        .default_value(0.00005)
         .scan<'g', double>()
+        .nargs(1);
+
+    parser.add_argument("-dt", "--delta-time")
+        .help("Time step saftey factor, 1 would be the maximum allowed by the stability condition.")
+        .default_value(0.1)
+        .scan<'g', double>()
+        .nargs(1);
+
+    parser.add_argument("-w", "--number-of-waves")
+        .help("Number of waves in the initial wave packet, controls the initial momentum of the wave packet.")
+        .default_value(40)
+        .scan<'i', int>()
         .nargs(1);
     
     try {
@@ -98,7 +110,7 @@ int main(int argc, char *argv[])
 
     // Run The Simulation.
     std::cout << "Starting simulation" << std::endl;
-    SSFM1D ssfm(parser.get<double>("--number-of-points"), parser.get<double>("--length"), parser.get<size_t>("--padding"));
+    SSFM1D ssfm(parser.get<double>("--number-of-points"), parser.get<double>("--length"), parser.get<size_t>("--padding"), parser.get<double>("--delta-time"), parser.get<int>("--number-of-waves"));
     double current_time = 0;
     double next_output_time = 0.0;
     int i = 0;
