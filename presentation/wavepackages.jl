@@ -25,18 +25,23 @@ using Plots
 # ╔═╡ f63d86e6-c8e2-4c90-8ddd-3ba4512557bb
 using PlutoUI
 
-# ╔═╡ 2c22461d-8291-44fc-8445-c916eb55d524
-md"""
-$$\Psi(x, 0) = \frac{1}{(\sigma \sqrt{\pi})^{1/2}} e^{-\frac{(x-x_0)^2}{2\sigma^2}} e^{i k_0 x}$$
-"""
+# ╔═╡ 1402f090-65bb-437e-87a8-5264fd8dd5c2
+TableOfContents()
 
 # ╔═╡ 0679cda3-d179-41df-b0ac-76b6f8164c2d
-md"# Definitions"
+md"""
+# Understanding Wavepackets
+
+
+
+$$\Psi(x, 0) = \frac{1}{(\sigma \sqrt{\pi})^{1/2}} e^{-\frac{(x-x_0)^2}{2\sigma^2}} e^{i k_0 x}$$
+
+"""
 
 # ╔═╡ ea734589-20de-48aa-a09a-bb00433bdfcc
 begin
 	L = 100.0        # Domain size
-	N = 1024         # Number of grid points
+	N = 4096         # Number of grid points
 	dx = L / N
 	x = collect(range(-L/2, L/2, length=N))
 	
@@ -45,8 +50,6 @@ begin
 	m = 1.0
 	t₁ = 20.0
 	dt = 0.1
-
-
 	
 end
 
@@ -62,31 +65,29 @@ x
 # ╔═╡ 3bb24f53-3d68-4c80-833b-99dc3f89f465
 @bind k₀ Slider(-10:0.1:10, default=0.0, show_value=true)
 
+# ╔═╡ 0a57c92e-ee6e-4423-848e-b33d7b596ab1
+begin
+	ψ = @. (1.0 / (σ * sqrt(pi))^0.5) * exp(-(x - x₀)^2 / (2 * σ^2)) * exp(im * k₀ * x)
+	plot(x,real.(ψ),imag.(ψ),label= "ψ r",c="blue")
+	#plot!(imag.(ψ),label= "ψ im",c="red")
+	plot!(x,zeros(N),abs.(ψ),label= "ψ²",c="black")
+	#f= mask(fft(ψ))
+	
+	
+	#plot!(real.(f), alpha = 0.4, label = "ψ̃ r",c="blue")
+	#plot!(imag.(f), alpha = 0.4, label = "ψ̃ im",c="red")
+	#plot!(abs.(f), label = "ψ̃²",c="black", ls=:dash)
+end
+
+# ╔═╡ b8f7a426-1962-4d53-b8a9-6d86da96d6c8
+
+
 # ╔═╡ ea5197e2-a705-40b8-835e-b38c2912b383
 function mask(vec)
 	norm = maximum(abs.(vec))
 	l = length(vec)
 	return vcat(vec[((l÷2)+1):l], vec[1:(l÷2)])./norm
 end
-
-
-# ╔═╡ 0a57c92e-ee6e-4423-848e-b33d7b596ab1
-begin
-	ψ = @. (1.0 / (σ * sqrt(pi))^0.5) * exp(-(x - x₀)^2 / (2 * σ^2)) * exp(im * k₀ * x)
-	plot(real.(ψ),label= "ψ r",c="blue")
-	plot!(imag.(ψ),label= "ψ im",c="red")
-	plot!(abs.(ψ),label= "ψ²",c="black")
-	f= mask(fft(ψ))
-	
-	plot!(real.(f), alpha = 0.4, label = "ψ̃ r",c="blue")
-	plot!(imag.(f), alpha = 0.4, label = "ψ̃ im",c="red")
-	plot!(abs.(f), label = "ψ̃²",c="black", ls=:dash)
-end
-
-# ╔═╡ b8f7a426-1962-4d53-b8a9-6d86da96d6c8
-mask(ψ)
-
-# ╔═╡ 8b648d61-c7b3-413c-aadb-ef74f1855803
 
 
 # ╔═╡ 8e674232-27f0-43e5-999d-4541d7e63a69
@@ -1292,8 +1293,8 @@ version = "1.9.2+0"
 # ╠═cd6bb602-4210-11f1-a9fc-43605765353f
 # ╠═16fb1f50-d2b2-4349-a0be-9d1cbbe0fec5
 # ╠═f63d86e6-c8e2-4c90-8ddd-3ba4512557bb
-# ╟─2c22461d-8291-44fc-8445-c916eb55d524
-# ╟─0679cda3-d179-41df-b0ac-76b6f8164c2d
+# ╠═1402f090-65bb-437e-87a8-5264fd8dd5c2
+# ╠═0679cda3-d179-41df-b0ac-76b6f8164c2d
 # ╠═ea734589-20de-48aa-a09a-bb00433bdfcc
 # ╟─05b6fee6-99be-491a-be49-676f57a908a2
 # ╠═b8ec0f64-7eee-438a-ad9e-5eba683c9ced
@@ -1302,7 +1303,6 @@ version = "1.9.2+0"
 # ╠═0a57c92e-ee6e-4423-848e-b33d7b596ab1
 # ╠═b8f7a426-1962-4d53-b8a9-6d86da96d6c8
 # ╠═ea5197e2-a705-40b8-835e-b38c2912b383
-# ╠═8b648d61-c7b3-413c-aadb-ef74f1855803
 # ╠═8e674232-27f0-43e5-999d-4541d7e63a69
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
